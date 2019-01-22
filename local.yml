@@ -1,0 +1,33 @@
+version: '3'
+
+volumes:
+  local_postgres_data: {}
+  local_postgres_data_backups: {}
+
+services:
+  express: &express
+    build:
+      context: .
+      dockerfile: ./compose/local/express/Dockerfile
+    image: express-typeorm-starter_local_express
+    depends_on:
+      - postgres
+    volumes:
+      - .:/app
+    env_file:
+      - ./.envs/.local/.express
+      - ./.envs/.local/.postgres
+    ports:
+      - '3000:3000'
+    command: /start
+
+  postgres:
+    build:
+      context: .
+      dockerfile: ./compose/local/postgres/Dockerfile
+    image: express-typeorm-starter_local_postgres
+    volumes:
+      - local_postgres_data:/var/lib/postgresql/data
+      - local_postgres_data_backups:/backups
+    env_file:
+      - ./.envs/.local/.postgres
