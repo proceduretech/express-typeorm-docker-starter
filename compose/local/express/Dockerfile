@@ -20,6 +20,9 @@ RUN sed -i 's/\r//' /start
 RUN chmod +x /start
 RUN chown express /start
 
+ADD ./scripts/nodeshell /usr/local/bin
+ADD ./scripts/dbshell /usr/local/bin
+
 COPY . /app
 RUN chown -R express /app
 USER express
