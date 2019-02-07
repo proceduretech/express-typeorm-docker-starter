@@ -1,0 +1,77 @@
+version: 2
+
+jobs:
+  deploy:
+    docker:
+      - image: circleci/python:3.6.5
+    working_directory: ~/express-typeorm-docker-starter
+    steps:
+      - checkout
+      - add_ssh_keys:
+          fingerprints:
+            - 'xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx'
+      - run:
+          name: Deploy to EC2
+          command: |
+            if [ "${CIRCLE_BRANCH}" == "develop" ]; then
+             ssh ec2-user@<your_ec2_public_dns> -o StrictHostKeyChecking=no 'bash -s' < ci_scripts/deploy_staging.sh
+            fi
+  kubernetes:
+    docker:
+      - image: circleci/python:3.6.5
+    working_directory: ~/app
+    steps:
+      - checkout
+      - setup_remote_docker:
+          docker_layer_caching: true
+      - run:
+          name: Export Environment Variables
+          command: |
+            bash ci_scripts/export_env_vars.sh
+      - add_ssh_keys:
+          fingerprints:
+            - '$FINGERPRINT'
+      - run:
+          name: Install AWS
+          command: |
+            sudo pip install awscli --upgrade
+      - run:
+          name: Install kubectl
+          command: |
+            bash ci_scripts/install_kubectl.sh
+      - run:
+          name: Install kops
+          command: |
+            bash ci_scripts/install_kops.sh
+      - run:
+          name: Export Kops config
+          command: |
+            kops export kubecfg $CLUSTER_NAME
+      - run:
+          name: Build and Deploy
+          command: |
+            bash ci_scripts/deploy.sh -i $IMAGE_NAME -t $TAG -a $AWS_ACCOUNT_ID -r $AWS_DEFAULT_REGION -p $DOCKERFILE_PATH
+
+workflows:
+  version: 2
+  test-and-deploy:
+    jobs:
+      # - unit_test
+      - deploy:
+          # requires:
+          #   - unit_test
+          filters:
+            branches:
+              only:
+                - develop
+  test-and-k8s:
+    jobs:
+      # - unit_test
+      - kubernetes:
+          # requires:
+          #   - unit_test
+          filters:
+            branches:
+              only:
+                - preprod
+                - master
