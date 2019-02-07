@@ -2,15 +2,15 @@
   "name": "express-typeorm-starter",
   "version": "0.1.0",
   "description": "Starter for Express TypeORM",
-  "main": "server/index.ts",
+  "main": "src/index.ts",
   "scripts": {
     "start": "node dist/index.js",
     "compile": "ts-node build.ts && tsc",
-    "dev": "nodemon server/index.ts | pino-pretty",
-    "dev:debug": "nodemon --exec 'node -r ts-node/register --inspect-brk' server/index.ts | pino-pretty",
+    "dev": "nodemon src/index.ts | pino-pretty",
+    "dev:debug": "nodemon --exec 'node -r ts-node/register --inspect-brk' src/index.ts | pino-pretty",
     "test": "mocha test/**/*.ts --exit",
     "test:debug": "mocha --inspect-brk test/**/*.ts --exit",
-    "typeorm": "ts-node ./node_modules/typeorm/cli.js"
+    "typeorm": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js"
   },
   "dependencies": {
     "body-parser": "^1.18.3",
@@ -36,6 +36,7 @@
     "shelljs": "^0.8.3",
     "supertest": "^3.3.0",
     "ts-node": "^7.0.1",
+    "tsconfig-paths": "^3.7.0",
     "tslint": "^5.12.0",
     "typescript": "^3.2.2"
   },
