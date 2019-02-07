@@ -5,11 +5,10 @@ RUN addgroup -S express \
 
 RUN apk update \
   # psycopg2 dependencies
-  && apk add --virtual build-deps gcc g++ musl-dev \
+  && apk add --virtual build-deps gcc g++ make python musl-dev \
   && apk add postgresql-dev \
   # https://docs.djangoproject.com/en/dev/ref/django-admin/#dbshell
-  && apk add postgresql-client make python
-
+  && apk add postgresql-client
 RUN npm install -g ts-node typescript nodemon pino-pretty
 
 # Requirements are installed here to ensure they will be cached.
@@ -24,13 +23,14 @@ RUN sed -i 's/\r//' /bin/nodeshell
 RUN chmod +x /bin/nodeshell
 RUN chown express /bin/nodeshell
 
-COPY ./compose/local/express/start /start
+COPY ./compose/staging/express/start /start
 RUN sed -i 's/\r//' /start
 RUN chmod +x /start
 RUN chown express /start
 
 COPY . /app
 WORKDIR /app
+COPY ./ormconfig-staging.js ./ormconfig.js
 
 RUN npm install
 RUN chown -R express .

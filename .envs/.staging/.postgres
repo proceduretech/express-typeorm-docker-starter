@@ -1,0 +1,7 @@
+# PostgreSQL
+# ------------------------------------------------------------------------------
+POSTGRES_HOST=postgres
+POSTGRES_PORT=5432
+POSTGRES_DB=express-typeorm-starter
+POSTGRES_USER=JqZWGiZFKgVsJCxhlWgIXpILtuAHHetE
+POSTGRES_PASSWORD=nXI8mTN926Qr4EIsHtzUeDLvf3OrzDSPszvZklUH1hY1I3utzMhsP71g1b08Smgw

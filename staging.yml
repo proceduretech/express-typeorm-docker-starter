@@ -1,0 +1,44 @@
+version: '3'
+
+volumes:
+  staging_postgres_data: {}
+  staging_postgres_data_backups: {}
+  staging_caddy: {}
+
+services:
+  express: &express
+    build:
+      context: .
+      dockerfile: ./compose/staging/express/Dockerfile
+    image: express-typeorm-starter_staging_express
+    depends_on:
+      - postgres
+    env_file:
+      - ./.envs/.staging/.express
+      - ./.envs/.staging/.postgres
+    command: /start
+
+  postgres:
+    build:
+      context: .
+      dockerfile: ./compose/staging/postgres/Dockerfile
+    image: express-typeorm-starter_staging_postgres
+    volumes:
+      - staging_postgres_data:/var/lib/postgresql/data
+      - staging_postgres_data_backups:/backups
+    env_file:
+      - ./.envs/.staging/.postgres
+
+  caddy:
+    build:
+      context: .
+      dockerfile: ./compose/staging/caddy/Dockerfile
+    image: express-typeorm-starter_staging_caddy
+    depends_on:
+      - express
+    volumes:
+      - staging_caddy:/root/.caddy
+    env_file:
+      - ./.envs/.staging/.caddy
+    ports:
+      - '0.0.0.0:80:80'
